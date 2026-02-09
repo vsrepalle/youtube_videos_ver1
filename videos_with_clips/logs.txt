@@ -1,0 +1,31 @@
+[2026-02-07 10:19:23] 🚀 Fetching Pexels popular videos...
+[2026-02-07 10:19:25] ⬇ Downloading video 6963395
+[2026-02-07 10:19:26] ✅ Saved: downloads/pexels\pexels_6963395.mp4
+[2026-02-07 10:19:26] ⬇ Downloading video 5386411
+[2026-02-07 10:19:33] ✅ Saved: downloads/pexels\pexels_5386411.mp4
+[2026-02-07 10:19:33] ⬇ Downloading video 7438482
+[2026-02-07 10:19:37] ✅ Saved: downloads/pexels\pexels_7438482.mp4
+[2026-02-07 10:19:37] ⬇ Downloading video 1526909
+[2026-02-07 10:19:39] ✅ Saved: downloads/pexels\pexels_1526909.mp4
+[2026-02-07 10:19:39] ⬇ Downloading video 1409899
+[2026-02-07 10:19:54] ✅ Saved: downloads/pexels\pexels_1409899.mp4
+[2026-02-07 10:19:54] 🎉 Download complete. Total: 5
+[2026-02-07 10:29:44] ❌ PEXELS_API_KEY not provided. Skipping Pexels fetch.
+[2026-02-07 10:30:31] 🚀 Starting scene-based Pexels fetch
+[2026-02-07 10:31:31] 🚀 Starting scene-based Pexels fetch
+[2026-02-07 10:31:31] 🔍 Scene 1: searching → Akihabara Tokyo street 2026 crowds
+[2026-02-07 10:31:32] ⬇ Downloading Scene 1
+[2026-02-07 10:31:45] ✅ Saved: RENT_A_GIRLFRIEND_JAPAN_2026_scene_1.mp4
+[2026-02-07 10:31:45] 🔍 Scene 2: searching → Japanese yen currency bills 2026
+[2026-02-07 10:31:46] ⬇ Downloading Scene 2
+[2026-02-07 10:31:48] ✅ Saved: RENT_A_GIRLFRIEND_JAPAN_2026_scene_2.mp4
+[2026-02-07 10:31:48] 🔍 Scene 3: searching → Japanese couple sitting in a cafe talking
+[2026-02-07 10:31:49] ⬇ Downloading Scene 3
+[2026-02-07 10:31:56] ✅ Saved: RENT_A_GIRLFRIEND_JAPAN_2026_scene_3.mp4
+[2026-02-07 10:31:56] 🔍 Scene 4: searching → Tokyo office worker walking at night
+[2026-02-07 10:31:56] ⬇ Downloading Scene 4
+[2026-02-07 10:32:12] ✅ Saved: RENT_A_GIRLFRIEND_JAPAN_2026_scene_4.mp4
+[2026-02-07 10:32:12] 🔍 Scene 5: searching → Rent-A-Girlfriend anime poster 2026
+[2026-02-07 10:32:13] ⬇ Downloading Scene 5
+[2026-02-07 10:32:15] ✅ Saved: RENT_A_GIRLFRIEND_JAPAN_2026_scene_5.mp4
+[2026-02-07 10:32:15] 🎉 All scenes processed

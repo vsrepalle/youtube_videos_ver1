@@ -1,0 +1,68 @@
+# --------------------
+# Python
+# --------------------
+__pycache__/
+*.pyc
+
+# --------------------
+# Virtual Envs
+# --------------------
+venv/
+.env/
+
+# --------------------
+# Generated Videos & Audio
+# --------------------
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.gif
+*.mp3
+*.wav
+*.aac
+
+# --------------------
+# Images & Media Cache
+# --------------------
+media_bank/
+frame_cache/
+*.jpg
+*.png
+*.jpeg
+
+# --------------------
+# Client / Server / Secrets
+# --------------------
+*client*.json
+*server*.json
+credentials*.json
+token*.json
+oauth*.json
+
+# --------------------
+# Runtime JSON (allow samples only)
+# --------------------
+*.json
+!*.sample.json
+!*.example.json
+
+# --------------------
+# Logs & Temp
+# --------------------
+*.log
+*.tmp
+*.cache
+
+# --------------------
+# IDE / OS
+# --------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# OAuth / Tokens (ABSOLUTELY NEVER COMMIT)
+*.pickle
+token.pickle
+*.token

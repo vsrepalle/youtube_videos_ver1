@@ -1,0 +1,17 @@
+PEXELS_API_KEY = "Oszdsq7V3DU1S8t1n6coHlHHeHb76cxZjb1HRYYvru32CpQYSmrO52ax"  # not needed for this step
+
+PIXABAY_API_KEY = "YOUR_PIXABAY_KEY_HERE"
+
+DOWNLOAD_DIR = "downloads/pexels"
+OUTPUT_DIR = "outputs"
+
+VIDEO_SIZE = (1080, 1920)   # Shorts / Reels
+FPS = 30
+
+WORDS_PER_SECOND = 2.5
+MIN_SCENE_DURATION = 4
+FONT_SIZE = 60
+FONT_COLOR = "white"
+STROKE_COLOR = "black"
+STROKE_WIDTH = 3
+BOTTOM_MARGIN = 220
