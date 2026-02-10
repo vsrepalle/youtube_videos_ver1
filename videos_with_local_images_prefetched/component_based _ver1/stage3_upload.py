@@ -1,4 +1,4 @@
-import os, sys, argparse
+import os, sys, json, argparse
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -12,37 +12,45 @@ def auth():
     token_file = "token.json"
     secrets_file = "client_secrets.json"
 
-    # Check if we already have a saved token
     if os.path.exists(token_file):
-        print("💡 Found existing 'token.json'.")
-        use_existing = input("❓ Use existing session? (y) or re-authenticate (n): ").lower()
-        if use_existing == 'y':
-            creds = Credentials.from_authorized_user_file(token_file, SCOPES)
+        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
 
-    # If no valid creds, or user chose 'n', run the login flow
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            print("🔄 Session expired. Refreshing token...")
             creds.refresh(google.auth.transport.requests.Request())
         else:
-            print("🔑 No valid session found. Opening browser for login...")
             if not os.path.exists(secrets_file):
-                print(f"❌ ERROR: Missing '{secrets_file}'! Please download it from Google Cloud Console.")
+                print(f"❌ ERROR: Missing '{secrets_file}'!")
                 sys.exit(1)
-            
             flow = InstalledAppFlow.from_client_secrets_file(secrets_file, SCOPES)
             creds = flow.run_local_server(port=0)
         
-        # Save the credentials for the next run
         with open(token_file, "w") as token:
             token.write(creds.to_json())
-            print(f"✅ New '{token_file}' created and saved.")
 
     return build("youtube", "v3", credentials=creds)
 
-def upload(video_path, title, description, tags):
+def upload_from_json(json_path):
+    # Load JSON Data
+    if not os.path.exists(json_path):
+        print(f"❌ ERROR: JSON file not found at {json_path}")
+        return
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Extract Metadata
+    meta = data.get("youtube_metadata", {})
+    video_path = data.get("file") # Path to the rendered MP4
+    title = meta.get("title", "TrendWave Update")
+    description = meta.get("description", "Tune with us for more such news")
+    # Convert list of tags to Python list if it's already a list, or split if it's a string
+    tags = meta.get("tags", ["news", "shorts"])
+    if isinstance(tags, str):
+        tags = tags.split(",")
+
     if not os.path.exists(video_path):
-        print(f"❌ ERROR: Video file not found at {video_path}")
+        print(f"❌ ERROR: Video file {video_path} not found!")
         return
 
     youtube = auth()
@@ -52,11 +60,11 @@ def upload(video_path, title, description, tags):
         "snippet": {
             "title": title,
             "description": description,
-            "tags": tags.split(","),
-            "categoryId": "24" 
+            "tags": tags,
+            "categoryId": "24" # Entertainment
         },
         "status": {
-            "privacyStatus": "private" # 🔒 Locked as private as requested
+            "privacyStatus": meta.get("privacyStatus", "private") # Always private by default
         }
     }
     
@@ -72,9 +80,6 @@ def upload(video_path, title, description, tags):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", required=True)
-    parser.add_argument("--title", required=True)
-    parser.add_argument("--description", default="tune with us for more such news")
-    parser.add_argument("--tags", default="news, shorts")
+    parser.add_argument("--json", required=True, help="Path to the JSON metadata file")
     args = parser.parse_args()
-    upload(args.file, args.title, args.description, args.tags)
+    upload_from_json(args.json)
