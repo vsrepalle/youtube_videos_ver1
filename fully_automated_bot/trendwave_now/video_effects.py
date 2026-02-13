@@ -1,7 +1,11 @@
 import os
-import numpy as np
 from moviepy.editor import *
 import moviepy.video.fx.all as vfx
+
+def apply_speed_multiplier(clip, factor=1.15):
+    """Speeds up the clip (video + audio) by the given factor."""
+    # .speedx adjusts both duration and audio playback speed
+    return clip.fx(vfx.speedx, factor)
 
 def apply_ken_burns(clip, zoom_ratio=0.04):
     """Adds a smooth zoom-in effect to an image clip."""
@@ -9,7 +13,6 @@ def apply_ken_burns(clip, zoom_ratio=0.04):
 
 def create_sentence_scrolling(full_text, duration, W, H):
     """Creates a scrolling effect that shows one sentence at a time."""
-    # Split by common sentence enders
     sentences = full_text.replace('!', '.').replace('?', '.').split('.')
     sentences = [s.strip() for s in sentences if len(s.strip()) > 5]
     
@@ -20,7 +23,6 @@ def create_sentence_scrolling(full_text, duration, W, H):
     clips = []
     
     for i, sentence in enumerate(sentences):
-        # Create a "label" style text for a single sentence
         txt = TextClip(
             sentence, 
             fontsize=65, 
@@ -33,13 +35,13 @@ def create_sentence_scrolling(full_text, duration, W, H):
             stroke_width=2
         ).set_start(i * each_dur).set_duration(each_dur).set_position(('center', 1100))
         
-        # Subtle "float up" animation for each sentence
+        # Subtle "float up" animation
         txt = txt.set_position(lambda t, i=i: ('center', 1150 - (t * 20)))
         clips.append(txt)
         
     return CompositeVideoClip(clips, size=(W, H))
 
-def add_background_audio(video_clip, bgm_path, volume=0.15):
+def add_background_audio(video_clip, bgm_path, volume=0.12):
     """Mixes background music with the voiceover."""
     if os.path.exists(bgm_path):
         bgm = AudioFileClip(bgm_path).volumex(volume).set_duration(video_clip.duration)

@@ -10,12 +10,7 @@ def get_authenticated_service():
     credentials = flow.run_local_server(port=0)
     return build("youtube", "v3", credentials=credentials)
 
-def upload_from_json(json_file, video_file=None):
-    """
-    Uploads a video to YouTube using data from a JSON file.
-    :param json_file: Path to the news_data.json
-    :param video_file: Optional path to the video. If provided, it overrides the JSON filename.
-    """
+def upload_from_json(json_file):
     if not os.path.exists(json_file):
         print(f"❌ JSON file not found: {json_file}")
         return
@@ -23,31 +18,25 @@ def upload_from_json(json_file, video_file=None):
     with open(json_file, "r", encoding="utf-8") as f:
         data_raw = json.load(f)
 
-    # Handle list-based JSON
+    # FIX: Correctly handle list-based JSON
     data = data_raw[0] if isinstance(data_raw, list) else data_raw
 
-    # Metadata & Path Logic: 
-    # Priority: 1. video_file argument, 2. JSON video_name, 3. Default fallback
-    video_filename = video_file or data.get("video_name") or "TrendWave_Latest.mp4"
+    # Metadata & Path Logic
+    video_filename = data.get("video_name") or "TrendWave_Final_V37.mp4"
     video_path = os.path.abspath(video_filename)
 
     if not os.path.exists(video_path):
-        print(f"❌ Video file NOT FOUND at: {video_path}")
+        print(f"❌ Video file NOT FOUND: {video_path}")
         return
 
     youtube = get_authenticated_service()
 
-    # Use Search Key for Title as per preference (e.g., Alissa Turney | Sarah Turney)
-    video_title = data.get("search_key", "TrendWave News Update").split('|')[0].strip()
-    if len(video_title) < 5: # Fallback to headline if search_key is missing
-        video_title = data.get("headline", "Latest News Update")
-
     request_body = {
         "snippet": {
-            "title": video_title,
+            "title": data.get("headline", "Cricket News Update"),
             "description": f"{data.get('details', '')}\n\nTune with us for more such news.",
-            "tags": ["news", "latest", "trends", "education"],
-            "categoryId": "27" # Education
+            "tags": ["cricket", "T20WorldCup", "IshanKishan", "HardikPandya", "news"],
+            "categoryId": "17" # Sports
         },
         "status": {
             "privacyStatus": "private", # ALWAYS PRIVATE BY DEFAULT
@@ -56,21 +45,18 @@ def upload_from_json(json_file, video_file=None):
     }
 
     media = MediaFileUpload(video_path, chunksize=-1, resumable=True)
-    print(f"🚀 Initializing Upload: {video_filename}...")
-    
+    print(f"🚀 Uploading: {video_filename}...")
     request = youtube.videos().insert(part="snippet,status", body=request_body, media_body=media)
 
     response = None
     while response is None:
         status, response = request.next_chunk()
-        if status: 
-            print(f"📈 Uploading... {int(status.progress() * 100)}%")
+        if status: print(f"📈 Uploading... {int(status.progress() * 100)}%")
 
     print(f"✅ Upload Complete! Video ID: {response['id']}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", default="news_data.json")
-    parser.add_argument("--file", default=None)
     args = parser.parse_args()
-    upload_from_json(args.json, video_file=args.file)
+    upload_from_json(args.json)
