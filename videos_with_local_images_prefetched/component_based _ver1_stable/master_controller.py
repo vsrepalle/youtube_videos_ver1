@@ -14,7 +14,7 @@ def run_step(step_name, command):
 
 def main():
     # SET JSON FILENAME HERE
-    json_path = "t20_wc_breaking_feb10.json" 
+    json_path = "news_11_feb.json" 
     
     # STEP 1: Assets (Images/Voice)
     if not run_step("Asset Preparation", ["python", "stage1_assets.py", json_path]): return
