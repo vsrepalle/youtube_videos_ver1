@@ -45,12 +45,29 @@ def generate_video(json_file):
     all_scenes = []
     for i, item in enumerate(items):
         print(f"Rendering Scene {i+1}...")
-        voice_p = f"v_{i}.mp3"
-        gTTS(text=f"{item['hook_text']}. {item['headline']}. {item['details']}", lang='en').save(voice_p)
-        audio = AudioFileClip(voice_p)
+        
+        # --- NEW: AUDIO GENERATION WITH 1.5s SILENCE ---
+        # Generate Question part
+        q_text = f"{item['hook_text']}. {item['headline']}."
+        gTTS(text=q_text, lang='en').save(f"q_{i}.mp3")
+        q_audio = AudioFileClip(f"q_{i}.mp3")
+        
+        # Generate Answer/Details part
+        a_text = f"{item['details']}"
+        gTTS(text=a_text, lang='en').save(f"a_{i}.mp3")
+        a_audio = AudioFileClip(f"a_{i}.mp3")
+        
+        # Create 1.5 seconds of silence
+        silence = AudioClip(lambda t: [0, 0], duration=1.5, fps=44100)
+        
+        # Combine into one audio track
+        audio = concatenate_audioclips([q_audio, silence, a_audio])
         dur = audio.duration
+        # -----------------------------------------------
 
         header = get_styled_header(item['hook_text'], dur, W).set_position(('center', 60))
+        
+        # The ticker now uses the FULL combined duration to stay perfectly in sync
         footer = get_styled_ticker(item['details'], dur, W, 300).set_position(('center', 920))
         prog_bar = get_progress_bar(dur, W, H)
 
@@ -66,8 +83,12 @@ def generate_video(json_file):
         all_scenes.append(scene)
 
     final_v = concatenate_videoclips(all_scenes, method="compose")
-    cta = TextClip("Tune with us for more such news", fontsize=38, color='white', bg_color='darkred', size=(W, 100), method='caption'
+    
+    # CTA logic remains unchanged
+    cta_text = "Tune with us for more such news"
+    cta = TextClip(cta_text, fontsize=38, color='white', bg_color='darkred', size=(W, 100), method='caption'
                    ).set_start(final_v.duration-3.5).set_duration(3.5).set_position(('center', H-250))
+    
     final_output = CompositeVideoClip([final_v, cta])
     
     if os.path.exists(BGM_PATH):
@@ -77,20 +98,19 @@ def generate_video(json_file):
     out_name = os.path.abspath(f"Viral_Short_{datetime.now().strftime('%M%S')}.mp4")
     final_output.write_videofile(out_name, fps=24, codec="libx264")
 
-    # 2. NEW: ASK USER TO CONTINUE WITH UPLOAD
-    print("\n" + "="*30)
-    print(f"✅ Video Generated: {out_name}")
+    # Cleanup temporary audio files
+    for f in os.listdir():
+        if f.endswith(".mp3") and (f.startswith("q_") or f.startswith("a_") or f.startswith("v_")):
+            try: os.remove(f)
+            except: pass
+
+    # Upload check
+    print(f"\n✅ Video Generated: {out_name}")
     user_choice = input("🚀 Do you want to upload this to YouTube now? (y/n): ").lower()
-    
     if user_choice == 'y':
-        print("📤 Starting Upload Pipeline...")
-        try:
-            # Pass the JSON data and the absolute path of the new video
-            upload_from_json(json_file, video_file=out_name)
-        except Exception as e:
-            print(f"❌ Upload failed: {e}")
+        upload_from_json(json_file, video_file=out_name)
     else:
-        print("⏭️ Upload skipped. Video saved locally.")
+        print("⏭️ Upload skipped.")
 
 if __name__ == "__main__":
     generate_video("news_data.json")
