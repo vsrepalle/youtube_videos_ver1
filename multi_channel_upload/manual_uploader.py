@@ -1,28 +1,55 @@
 import os
-from headline_details_video_ver8_multi_channel import get_youtube_service, upload_to_youtube
+import tkinter as tk
+from tkinter import filedialog
+# Updated Import: Matching your stage3_upload.py
+from stage3_upload import get_authenticated_service, upload_from_json
+
+def browse_file(title, file_types):
+    """Opens explorer and returns the selected path."""
+    root = tk.Tk()
+    root.withdraw()  # Hide the small main tkinter window
+    root.attributes("-topmost", True) # Bring the dialog to the front
+    file_path = filedialog.askopenfilename(title=title, filetypes=file_types)
+    root.destroy()
+    return file_path
 
 def manual_mode():
-    print("--- 🛠️ MANUAL UPLOAD TOOL ---")
-    file_path = input("File path (e.g. video.mp4): ")
-    if not os.path.exists(file_path):
-        print("Error: File doesn't exist.")
+    print("\n" + "="*40)
+    print(" 🛠️  MANUAL YOUTUBE UPLOADER (EXPLORER MODE) ")
+    print("="*40)
+    
+    # 1. Select Video File
+    print("📂 Please select your Video File...")
+    video_path = browse_file("Select Video to Upload", [("Video Files", "*.mp4 *.mov *.avi"), ("All Files", "*.*")])
+    if not video_path:
+        print("🛑 No video selected. Exiting.")
         return
+    print(f"✅ Selected Video: {os.path.basename(video_path)}")
 
-    chan = input("Target Channel (TrendWave Now / SpaceMind AI): ")
-    title = input("Video Title: ")
-    desc = input("Description: ") + "\n\nTune with us for more such news."
-    tags = input("Tags (comma separated): ").split(",")
+    # 2. Select JSON File
+    print("\n📄 Please select the Metadata JSON file...")
+    json_path = browse_file("Select Metadata JSON", [("JSON Files", "*.json"), ("All Files", "*.*")])
+    if not json_path:
+        print("🛑 No JSON selected. Exiting.")
+        return
+    print(f"✅ Selected JSON: {os.path.basename(json_path)}")
 
-    meta = {
-        "title": title,
-        "description": desc,
-        "tags": [t.strip() for t in tags],
-        "category_id": "22"
-    }
+    # 3. Channel and Index (Still manual for precision)
+    print("\nTarget Channels: TrendWave Now | SpaceMind AI")
+    chan = input("📺 Target Channel Name: ").strip()
+    index = int(input("🔢 Enter scene index from JSON (usually 0, 1, or 2): "))
 
-    service = get_youtube_service(chan)
-    if service:
-        upload_to_youtube(service, file_path, meta)
+    print(f"\n⏳ Initializing upload for '{chan}'...")
+    
+    try:
+        # Trigger the actual upload function from your stage3 script
+        upload_from_json(json_path, video_file=video_path, index=index)
+        print("\n" + "-"*40)
+        print("✅ SUCCESS: Video is being processed by YouTube!")
+        print("-"*40)
+
+    except Exception as e:
+        print(f"💥 An error occurred: {e}")
 
 if __name__ == "__main__":
     manual_mode()
